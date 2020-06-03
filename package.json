@@ -1,0 +1,19 @@
+{
+  "name": "backend-node-helper-service",
+  "version": "1.0.0",
+  "description": "A server side node.js program to collect data from TBA (The Blue Alliance) and push to our own servers",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.6.0",
+  },
+  "engines": {
+    "node": "12"
+  }
+}
