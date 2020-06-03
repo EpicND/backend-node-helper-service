@@ -1,0 +1,23 @@
+{
+  "name": "backend-node-helper-service",
+  "version": "1.0.0",
+  "description": "A server side node.js program to collect data from TBA (The Blue Alliance) and push to our own servers",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EpicND/backend-node-helper-service.git"
+  },
+  "author": "ccans, DhairyaG23",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EpicND/backend-node-helper-service/issues"
+  },
+  "homepage": "https://github.com/EpicND/backend-node-helper-service#readme",
+  "dependencies": {
+    "node-fetch": "^2.6.0"
+  }
+}
