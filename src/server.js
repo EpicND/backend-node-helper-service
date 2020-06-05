@@ -1,4 +1,7 @@
 const fetch = require('node-fetch');
+const admin = require('firebase-admin')
+
+fireApp = admin.initializeApp();
 
 var teamTotal = 0;
 var autoAvg = 0;
