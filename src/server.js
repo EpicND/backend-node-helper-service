@@ -41,6 +41,7 @@ class team {
 
 }
 
+console.time()
 
 // var pH3 = 1;
 // callEvents(2019);
@@ -63,7 +64,7 @@ function callEvents(year) {
 callTeams("2020mndu")
 //This function is the loop that runs throgh every team. it just repeteadly calls process() with different tkey-ekey pairs
 function callTeams(eKey) {
-  console.log("Calling the data for the event " + eKey);
+  // console.log("Calling the data for the event " + eKey);
   var pH4 = "https://www.thebluealliance.com/api/v3/event/" + eKey + "/teams/keys?X-TBA-Auth-Key=lrqZK0XAvSpeHXuWi9vhbmnAbF4ueBRQB3OevJC1pOWIWQdwX1WKRJ4oQceP0ox5";
   let pH5 = new URL(pH4);
 
@@ -117,13 +118,13 @@ function process(tKey, eKey) {
 
             teamWLRequestObj = myJson;
             wltRec = teamWLRequestObj[String(eKey)];
-            console.log(wltRec);
+            // console.log(wltRec);
 
             if(!wltRec) {
 
             } else {
             if(wltRec.playoff == null) {
-              console.log(tKey + "not in playoffs");
+              // console.log(tKey + "not in playoffs");
               wins = wltRec.qual.ranking.record.wins;
               losses = wltRec.qual.ranking.record.losses;
               ties = wltRec.qual.ranking.record.ties;
@@ -230,3 +231,5 @@ function resetVariables2() {
     losses = 0;
     ties = 0;
 }
+
+console.timeEnd()
