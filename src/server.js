@@ -47,7 +47,7 @@ class team {
 
 
 // var pH3 = 1;
-callEvents(2020);
+callEvents(2019);
 
 //This function is the loop that runs through every event. It jsut repeatedly calls callTeams() with different eKey's
 function callEvents(year) {
@@ -133,8 +133,8 @@ function process(tKey, eKey, year, apiKey) {
             teamWLRequestObj = myJson;
             wltRec = teamWLRequestObj[String(eKey)];
 
-            if(!wltRec) {
-
+            if(wltRec.qual == null) {
+              console.log(myJson);
             } else {
             if(wltRec.playoff == null) {
               wins = wltRec.qual.ranking.record.wins;
