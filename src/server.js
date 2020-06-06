@@ -29,8 +29,12 @@ var wins= 0;
 var losses = 0;
 var ties = 0;
 var teamWLRequestObj;
+var wltratio;
 
 var done;
+var inPlayoffs;
+
+
 
 
 
@@ -43,7 +47,7 @@ class team {
 
 
 // var pH3 = 1;
-// callEvents(2019);
+callEvents(2020);
 
 //This function is the loop that runs through every event. It jsut repeatedly calls callTeams() with different eKey's
 function callEvents(year) {
@@ -55,14 +59,29 @@ function callEvents(year) {
       return response.json();
     })
     .then((myJson) => {
-      // console.log(myJson.length);
-      callTeams(myJson[pH3]);
+      console.log(myJson.length);
+      // console.log(myJson);
+      // console.log()
+    var pH3 = 0;
+    kbuddy();
+    pH3 = 6;
+    function kbuddy() {
+      callTeams(myJson[pH3], year);
+      pH3++;
+      callTeams(myJson[pH3], year);
+        if(pH3 <myJson.length) {
+          setTimeout(function(){
+          pH3++;
+          kbuddy();
+      }, 7500);
+      }
+    }
 });
 }
 
-callTeams("2020mndu")
+// callTeams("2020mndu");
 //This function is the loop that runs throgh every team. it just repeteadly calls process() with different tkey-ekey pairs
-function callTeams(eKey) {
+function callTeams(eKey, year) {
   console.log("Calling the data for the event " + eKey);
   var pH4 = "https://www.thebluealliance.com/api/v3/event/" + eKey + "/teams/keys?X-TBA-Auth-Key=lrqZK0XAvSpeHXuWi9vhbmnAbF4ueBRQB3OevJC1pOWIWQdwX1WKRJ4oQceP0ox5";
   let pH5 = new URL(pH4);
@@ -76,37 +95,33 @@ function callTeams(eKey) {
 
       } else {
       var pH6 = 0;
-      epic1();
+      // epic1();
       done = false;
-      function epic1() {
-        if(pH6 < myJson.length) {
-        process(myJson[pH6], eKey);
-        setTimeout(function(){
-          epic2();
-        }, 250);
+      var x = 1;
+      for(pH6 = 0; pH6 < myJson.length; pH6++) {
+          if(x == 1) {
+          process(myJson[pH6], eKey, year, "lrqZK0XAvSpeHXuWi9vhbmnAbF4ueBRQB3OevJC1pOWIWQdwX1WKRJ4oQceP0ox5");
+          x=0;
+        } else {
+          process(myJson[pH6], eKey, year, "eGAeqTgTHJcHhMWBaTToL9qihuJLsHobLS64C5HsfZBB2t3csdxzngRuOMjLrWLf");
+          x=1;
         }
-      }
-      function epic2() {
-        setTimeout(function(){
-        if(done) {
-        pH6++;
-        setTimeout(function(){
-          epic1();
-        }, 250);
-      } else {
-        epic2();
-      }
-      }, 250);
       }
 
     }
 });
 }
 
+// process("frc4537", "2019audd", 2019);
 
 //This function takes a team and an event and processes it, spitting out rank, avgs, and whatever else we wanted
-function process(tKey, eKey) {
-          var eee = "https://www.thebluealliance.com/api/v3/team/"+ tKey + "/events/2020/statuses?X-TBA-Auth-Key=lrqZK0XAvSpeHXuWi9vhbmnAbF4ueBRQB3OevJC1pOWIWQdwX1WKRJ4oQceP0ox5";
+
+
+
+function process(tKey, eKey, year, apiKey) {
+          resetVariables();
+
+          var eee = "https://www.thebluealliance.com/api/v3/team/"+ tKey + "/events/" + year + "/statuses?X-TBA-Auth-Key=" + apiKey;
           let ok2 =  new URL(eee);
           fetch(ok2)
           .then((response) => {
@@ -117,20 +132,25 @@ function process(tKey, eKey) {
 
             teamWLRequestObj = myJson;
             wltRec = teamWLRequestObj[String(eKey)];
-            console.log(wltRec);
 
             if(!wltRec) {
 
             } else {
             if(wltRec.playoff == null) {
-              console.log(tKey + "not in playoffs");
               wins = wltRec.qual.ranking.record.wins;
               losses = wltRec.qual.ranking.record.losses;
               ties = wltRec.qual.ranking.record.ties;
+              wltratio = (wins/(wins+losses)).toFixed(2);
+              console.log("Processing finished " + tKey + " at event " + eKey);
+              console.log(tKey + " " + wltratio);
           } else {
+            inPlayoffs = true;
               wins = wltRec.playoff.record.wins + wltRec.qual.ranking.record.wins;
               losses = wltRec.playoff.record.losses + wltRec.qual.ranking.record.losses;
               ties = wltRec.playoff.record.ties + wltRec.qual.ranking.record.ties;
+              wltratio = (wins/(wins+losses)).toFixed(2);
+              console.log("Processing finished " + tKey + " at event " + eKey);
+              console.log(tKey + " " + wltratio);
           }
           }
           });
@@ -138,7 +158,7 @@ function process(tKey, eKey) {
 
 
 
-        var fff = "https://www.thebluealliance.com/api/v3/team/"+ tKey + "/event/" + eKey + "/matches?X-TBA-Auth-Key=lrqZK0XAvSpeHXuWi9vhbmnAbF4ueBRQB3OevJC1pOWIWQdwX1WKRJ4oQceP0ox5";
+        var fff = "https://www.thebluealliance.com/api/v3/team/"+ tKey + "/event/" + eKey + "/matches?X-TBA-Auth-Key=" + apiKey;
         let ok = new URL(fff);
 
         fetch(ok)
@@ -150,7 +170,7 @@ function process(tKey, eKey) {
             // console.log(myJson);
             // String teamNum = yourStringVariable.Substring(0,5);
 
-            resetVariables();
+
 
 
             var theJson = myJson;
@@ -161,19 +181,28 @@ function process(tKey, eKey) {
             if(theJson[matchNum].alliances.blue.score >= 0) {
               gamesPlayed++;
             if(blueKeyArray.includes(tKey)) {
+              if(theJson[matchNum].alliances == undefined || theJson[matchNum].alliances == null || theJson[matchNum].score_breakdown == null || theJson[matchNum].score_breakdown == undefined) {
+                  console.log("----- ERROR: " + tKey + " at " + eKey + " -----");
+              } else {
               teamTotal += theJson[matchNum].alliances.blue.score;
               outerVar += theJson[matchNum].score_breakdown.blue.autoCellsOuter + theJson[matchNum].score_breakdown.red.teleopCellsOuter;
               innerVar += theJson[matchNum].score_breakdown.blue.autoCellsInner + theJson[matchNum].score_breakdown.red.teleopCellsInner;
               bottomVar += theJson[matchNum].score_breakdown.blue.autoCellsBottom + theJson[matchNum].score_breakdown.red.teleopCellsBottom;
               autoTotal += theJson[matchNum].score_breakdown.blue.autoPoints;
               tOPTotal += theJson[matchNum].score_breakdown.blue.teleopPoints;
+            }
+              // counter2++;
             } else {
+              if(theJson[matchNum].alliances == undefined || theJson[matchNum].alliances == null || theJson[matchNum].score_breakdown == null || theJson[matchNum].score_breakdown == undefined ) {
+                  console.log("----- ERROR: " + tKey + " at " + eKey + " -----");
+              } else {
               teamTotal += theJson[matchNum].alliances.red.score;
               outerVar += theJson[matchNum].score_breakdown.red.autoCellsOuter + theJson[matchNum].score_breakdown.red.teleopCellsOuter;
               innerVar += theJson[matchNum].score_breakdown.red.autoCellsInner + theJson[matchNum].score_breakdown.red.teleopCellsInner;
               bottomVar += theJson[matchNum].score_breakdown.red.autoCellsBottom + theJson[matchNum].score_breakdown.red.teleopCellsBottom;
               autoTotal += theJson[matchNum].score_breakdown.red.autoPoints;
               tOPTotal += theJson[matchNum].score_breakdown.red.teleopPoints;
+            }
             }
           }
 
@@ -190,10 +219,14 @@ function process(tKey, eKey) {
             losses;
             ties;
 
-            console.log("Processing finished " + tKey + " at event " + eKey);
-            console.log(tKey + "Won: " + wins + "\nLost: " + losses);
-            done = true;
+            inPlayoffs;
 
+            console.log("Processing finished " + tKey + " at event " + eKey);
+            console.log(tKey + " " + autoAvg);
+
+            if(matchNum = theJson.length) {
+            done = true;
+          }
 
           });
     }
@@ -220,6 +253,8 @@ function resetVariables() {
   teamAlliance = "";
   theJson = "";
   gamesPlayed = 0;
+  wltratio = 0;
+  inPlayoffs = false;
 }
 
 function resetVariables2() {
