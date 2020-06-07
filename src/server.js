@@ -1,7 +1,24 @@
 const fetch = require('node-fetch');
-const admin = require('firebase-admin')
+var firebaseAdmin = require('firebase-admin');
 
-fireApp = admin.initializeApp();
+
+
+const ytdl = require('ytdl-core');
+const serviceAcc = require('../fbToken.json');
+
+var app = firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(serviceAcc),
+    databaseURL: "https://frc-scouting-epicnd.firebaseio.com"
+  });
+const database = app.database();
+var db = firebaseAdmin.database();
+
+
+test();
+
+function test() {
+
+}
 
 var teamTotal = 0;
 var autoAvg = 0;
@@ -38,17 +55,20 @@ var inPlayoffs;
 
 
 
-class team {
-  constructor(team_number) {
-    this.teamNum = team_number;
-  }
-
-}
 
 console.time()
+var cury = 2016;
 
-// var pH3 = 1;
-callEvents(2019);
+// caller();
+function caller() {
+if(cury>2014) {
+  callEvents(cury);
+  cury--
+setTimeout(function(){
+  caller()
+}, 600000);
+}
+}
 
 //This function is the loop that runs through every event. It jsut repeatedly calls callTeams() with different eKey's
 function callEvents(year) {
@@ -66,6 +86,7 @@ function callEvents(year) {
     var pH3 = 0;
     kbuddy();
     pH3 = 6;
+
     function kbuddy() {
       callTeams(myJson[pH3], year);
       pH3++;
@@ -80,7 +101,7 @@ function callEvents(year) {
 });
 }
 
-// callTeams("2020mndu");
+callTeams("2020mndu", 2020);
 //This function is the loop that runs throgh every team. it just repeteadly calls process() with different tkey-ekey pairs
 
 function callTeams(eKey, year) {
@@ -103,6 +124,7 @@ function callTeams(eKey, year) {
       for(pH6 = 0; pH6 < myJson.length; pH6++) {
           if(x == 1) {
           process(myJson[pH6], eKey, year, "lrqZK0XAvSpeHXuWi9vhbmnAbF4ueBRQB3OevJC1pOWIWQdwX1WKRJ4oQceP0ox5");
+          var ref = db.ref("/" + year);
           x=0;
         } else {
           process(myJson[pH6], eKey, year, "eGAeqTgTHJcHhMWBaTToL9qihuJLsHobLS64C5HsfZBB2t3csdxzngRuOMjLrWLf");
@@ -114,13 +136,19 @@ function callTeams(eKey, year) {
 });
 }
 
-// process("frc4537", "2019audd", 2019);
+// process("frc2264", "2020mndu", 2020, "eGAeqTgTHJcHhMWBaTToL9qihuJLsHobLS64C5HsfZBB2t3csdxzngRuOMjLrWLf");
 
 //This function takes a team and an event and processes it, spitting out rank, avgs, and whatever else we wanted
 
 
 
 function process(tKey, eKey, year, apiKey) {
+          var ref = db.ref("/"+ year + "/" + eKey);
+          ref.update({
+            [tKey] : {
+              "ph" : "ph"
+            },
+          })
           resetVariables();
 
           var eee = "https://www.thebluealliance.com/api/v3/team/"+ tKey + "/events/" + year + "/statuses?X-TBA-Auth-Key=" + apiKey;
@@ -136,25 +164,44 @@ function process(tKey, eKey, year, apiKey) {
             wltRec = teamWLRequestObj[String(eKey)];
             // console.log(wltRec);
 
-            if(wltRec.qual == null) {
+            if(wltRec.qual == null && wltRec.playoff == null) {
               console.log(myJson);
             } else {
-            if(wltRec.playoff == null) {
+            if(wltRec.playoff == null && wltRec.qual != null) {
               // console.log(tKey + "not in playoffs");
               wins = wltRec.qual.ranking.record.wins;
               losses = wltRec.qual.ranking.record.losses;
               ties = wltRec.qual.ranking.record.ties;
-              wltratio = (wins/(wins+losses)).toFixed(2);
+              wltratio = (wins/(wins+losses+ties)).toFixed(2);
+              var ref = db.ref("/"+ year + "/" + eKey + "/" + tKey);
+              ref.update({
+                  "wltratio" : wltratio,
+              })
               console.log("Processing finished " + tKey + " at event " + eKey);
               console.log(tKey + " " + wltratio);
-          } else {
+          } else if(wltRec.playoff != null && wltRec.qual != null) {
             inPlayoffs = true;
               wins = wltRec.playoff.record.wins + wltRec.qual.ranking.record.wins;
               losses = wltRec.playoff.record.losses + wltRec.qual.ranking.record.losses;
               ties = wltRec.playoff.record.ties + wltRec.qual.ranking.record.ties;
-              wltratio = (wins/(wins+losses)).toFixed(2);
+              wltratio = (wins/(wins+losses+ties)).toFixed(2);
+              var ref = db.ref("/"+ year + "/" + eKey + "/" + tKey);
+              ref.update({
+                  "wltratio" : wltratio,
+              })
               console.log("Processing finished " + tKey + " at event " + eKey);
               console.log(tKey + " " + wltratio);
+          } else {
+            wins = wltRec.playoff.record.wins;
+            losses = wltRec.playoff.record.losses;
+            ties = wltRec.playoff.record.ties;
+            wltratio = (wins/(wins+losses+ties)).toFixed(2);
+            var ref = db.ref("/"+ year + "/" + eKey + "/" + tKey);
+            ref.update({
+                "wltratio" : wltratio,
+            })
+            console.log("Processing finished " + tKey + " at event " + eKey);
+            console.log(tKey + " " + wltratio);
           }
           }
           });
@@ -187,6 +234,7 @@ function process(tKey, eKey, year, apiKey) {
             if(blueKeyArray.includes(tKey)) {
               if(theJson[matchNum].alliances == undefined || theJson[matchNum].alliances == null || theJson[matchNum].score_breakdown == null || theJson[matchNum].score_breakdown == undefined) {
                   console.log("----- ERROR: " + tKey + " at " + eKey + " -----");
+                  console.log(theJson);
               } else {
               teamTotal += theJson[matchNum].alliances.blue.score;
               outerVar += theJson[matchNum].score_breakdown.blue.autoCellsOuter + theJson[matchNum].score_breakdown.red.teleopCellsOuter;
@@ -199,6 +247,7 @@ function process(tKey, eKey, year, apiKey) {
             } else {
               if(theJson[matchNum].alliances == undefined || theJson[matchNum].alliances == null || theJson[matchNum].score_breakdown == null || theJson[matchNum].score_breakdown == undefined ) {
                   console.log("----- ERROR: " + tKey + " at " + eKey + " -----");
+                  console.log(theJson[matchNum]);
               } else {
               teamTotal += theJson[matchNum].alliances.red.score;
               outerVar += theJson[matchNum].score_breakdown.red.autoCellsOuter + theJson[matchNum].score_breakdown.red.teleopCellsOuter;
@@ -223,14 +272,20 @@ function process(tKey, eKey, year, apiKey) {
             losses;
             ties;
 
+            var ref = db.ref("/"+ year + "/" + eKey + "/" + tKey);
+            ref.update({
+                "averages" : {
+                  "autoAvg" : autoAvg,
+                  "tOPAvg" : tOPAvg,
+                },
+                "inPlayoffs" : inPlayoffs,
+                "games" : theJson.length
+            })
             inPlayoffs;
 
             console.log("Processing finished " + tKey + " at event " + eKey);
             console.log(tKey + " " + autoAvg);
 
-            if(matchNum = theJson.length) {
-            done = true;
-          }
 
           });
     }
