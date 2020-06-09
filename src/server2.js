@@ -48,7 +48,7 @@ async function main() {
     console.log(eventsForYearKeys);
     
     var teamsAtEventKeys = await getTeams('2020mndu');
-    
+
     console.log(teamsAtEventKeys);
 
 }
