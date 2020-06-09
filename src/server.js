@@ -110,7 +110,7 @@ function callEvents(year) {
 var pH6 = 0;
 
 function callTeams(eKey, year, u) {
-  // console.log("Calling the data for the event " + eKey);
+  console.log("Calling the data for the event " + eKey);
   var pH4 = "https://www.thebluealliance.com/api/v3/event/" + eKey + "/teams/keys?X-TBA-Auth-Key=lrqZK0XAvSpeHXuWi9vhbmnAbF4ueBRQB3OevJC1pOWIWQdwX1WKRJ4oQceP0ox5";
   let pH5 = new URL(pH4);
 
