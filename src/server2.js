@@ -3,54 +3,68 @@ const fetch = require('node-fetch');
 
 const tbaKey = "lrqZK0XAvSpeHXuWi9vhbmnAbF4ueBRQB3OevJC1pOWIWQdwX1WKRJ4oQceP0ox5"
 
-
+// This function is used to retrieve the events in a specified year, takes in the "year" parameter
 async function getEvents(year){
 
-    var events;
+    var eventsResp = new Array;
 
     await fetch(`https://www.thebluealliance.com/api/v3/events/${year}/keys?X-TBA-Auth-Key=${tbaKey}`)
         .then((response) => {
             return response.json();
         })
         .then((respJson) => {
-            // console.log(respJson)
-            events = respJson; 
-            // console.log(events)
-
+            eventsResp = respJson;
         });
 
-    return events; 
+    return eventsResp; 
 
 }
 
 
-
+// This function is used to retrieve the teams at a specified event, takes in the "eventKey" parameter
 async function getTeams(eventKey){
-    var teams;
+    var teamsResp = new Array;
 
     await fetch(`https://www.thebluealliance.com/api/v3/event/${eventKey}/teams/keys?X-TBA-Auth-Key=${tbaKey}`)
         .then((response) => {
             return response.json();
         })
         .then((respJson) => {
-            // console.log(respJson)
-            teams = respJson; 
+            teamsResp = respJson; 
         });
         
-        return teams; 
+        return teamsResp; 
 }
 
 
-async function main() {
+async function processTeamAtEvent(teamKey, eventKey) {
 
-    var eventsForYearKeys = await getEvents('2020');
+}
+ 
 
-    console.log(eventsForYearKeys);
+
+//processes a specific event, useful for faster async operations and abstracted for webhook integration
+async function processEvent(eventKey) {
+    var eventTeams = await getTeams(eventKey);
+    // TODO: Retrieve and process data for every team at event
+}
+
+
+async function processAllEvents() {
+
+    var eventKeys = await getEvents('2020');
+
+    console.log(eventKeys);
     
-    var teamsAtEventKeys = await getTeams('2020mndu');
 
-    console.log(teamsAtEventKeys);
+    console.log(teamKeys);
 
 }
 
-main()
+
+async function deleteAllDataAtEndpoint(endpoint) {
+
+}
+
+// processAllEvents();
+processEvent('2020mndu')
