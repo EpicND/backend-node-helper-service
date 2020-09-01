@@ -183,9 +183,7 @@ function process(tKey, eKey, year, apiKey, u) {
               ref.update({
                   "wltratio" : this["wltratio" + u],
               })
-              // console.log(this["wins" + u])
-              // console.log("Processing finished " + tKey + " at event " + eKey);
-              // console.log(tKey + " " + this["wltratio" + u]);
+
           } else if(wltRec.playoff != null && wltRec.qual != null) {
             inPlayoffs = true;
               this["wins" + u] = this["wltRec" + u].playoff.record.wins + this["wltRec" + u].qual.ranking.record.wins;
@@ -196,9 +194,7 @@ function process(tKey, eKey, year, apiKey, u) {
               ref.update({
                   "wltratio" : this["wltratio" + u],
               })
-              // console.log(this["wins" + u])
-              // console.log("Processing finished " + tKey + " at event " + eKey);
-              // console.log(tKey + " " + this["wltratio" + u]);
+
           } else {
             this["wins" + u] = this["wltRec" + u].playoff.record.wins;
             this["losses" + u] = this["wltRec" + u].playoff.record.losses;

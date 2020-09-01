@@ -1,7 +1,10 @@
 const fetchPromises = require('node-fetch').promises;
 const fetch = require('node-fetch');
 
-const tbaKey = "lrqZK0XAvSpeHXuWi9vhbmnAbF4ueBRQB3OevJC1pOWIWQdwX1WKRJ4oQceP0ox5"
+const tbaKey = "lrqZK0XAvSpeHXuWi9vhbmnAbF4ueBRQB3OevJC1pOWIWQdwX1WKRJ4oQceP0ox5";
+
+
+
 
 // This function is used to retrieve the events in a specified year, takes in the "year" parameter
 async function getEvents(year){
@@ -38,14 +41,39 @@ async function getTeams(eventKey){
 
 
 async function processTeamAtEvent(teamKey, eventKey) {
+        var resp = new Object;
+          await fetch(`https://www.thebluealliance.com/api/v3/team/${teamKey}/event/${eventKey}/matches?X-TBA-Auth-Key=${tbaKey}`)
+          .then((response) => {
+            return response.json();
+          })
+          .then((myJson) => {
+            resp = myJson;
+          })
 
+          return resp;
+    
+        
 }
  
 
 
 //processes a specific event, useful for faster async operations and abstracted for webhook integration
 async function processEvent(eventKey) {
+    var processedEventObject = new Object;
     var eventTeams = await getTeams(eventKey);
+    var promiseArray = new Array;
+    for(let i=0; i < eventTeams.length; i++) {
+        // processedEventObject[eventTeams[i].substring(3)] = await processTeamAtEvent(eventTeams[i], eventKey);
+        promiseArray.push(processTeamAtEvent(eventTeams[i], eventKey))
+    }
+
+    await Promise.all(promiseArray).then((vals) => {
+        for(i=0; i<vals.length; i++) {
+            curVal = vals[i];
+            processedEventObject = {...processedEventObject, ...vals[i]};
+        }
+    })
+    console.log(processedEventObject)   
     // TODO: Retrieve and process data for every team at event
 }
 
