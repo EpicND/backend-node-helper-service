@@ -61,7 +61,7 @@ var cury = 2019;
 
 caller();
 function caller() {
-if(cury>2014) {
+if(cury>2016) {
   callEvents(cury);
   cury--
 setTimeout(function(){
@@ -93,19 +93,19 @@ function callEvents(year) {
       callTeams(myJson[pH3], year, 2000);
       pH3++;
       callTeams(myJson[pH3], year, 3000);
-      pH3++;
-      callTeams(myJson[pH3], year, 4000);
-        if(pH3 <myJson.length) {
+        if(pH3 < myJson.length-1) {
           setTimeout(function(){
           pH3++;
           kbuddy();
-      }, 7500);
-      }
+      }, 5000);
+    } else {
+      console.log("Done with " + year);
+    }
     }
 });
 }
 
-// callTeams("2020mndu", 2020);
+// callTeams("2020mndu", 2020, 1000);
 //This function is the loop that runs throgh every team. it just repeteadly calls process() with different tkey-ekey pairs
 var pH6 = 0;
 
@@ -141,7 +141,7 @@ function callTeams(eKey, year, u) {
 });
 }
 
-// process("frc2264", "2020mndu", 2020, "eGAeqTgTHJcHhMWBaTToL9qihuJLsHobLS64C5HsfZBB2t3csdxzngRuOMjLrWLf", 0);
+// process("frc2264", "2020mndu", 2020, "eGAeqTgTHJcHhMWBaTToL9qihuJLsHobLS64C5HsfZBB2t3csdxzngRuOMjLrWLf", );
 
 //This function takes a team and an event and processes it, spitting out rank, avgs, and whatever else we wanted
 
@@ -169,12 +169,12 @@ function process(tKey, eKey, year, apiKey, u) {
             this["teamWLRequestObj" + u] = myJson;
             this["wltRec" + u] = this["teamWLRequestObj" + u][String(eKey)];
             // // console.log(wltRec);
-
+            if(this["wltRec" + u] != null) {
             if(this["wltRec" + u].qual == null && this["wltRec" + u].playoff == null) {
               // console.log(myJson);
             } else {
             if(this["wltRec" + u].playoff == null && this["wltRec" + u].qual != null) {
-              // // console.log(tKey + "not in playoffs");
+              this["inPlayoffs" + u] = false;
               this["wins" + u] = this["wltRec" + u].qual.ranking.record.wins;
               this["losses" + u] = this["wltRec" + u].qual.ranking.record.losses;
               this["ties" + u] = this["wltRec" + u].qual.ranking.record.ties;
@@ -182,6 +182,7 @@ function process(tKey, eKey, year, apiKey, u) {
               var ref = db.ref("/"+ year + "/" + eKey + "/" + tKey);
               ref.update({
                   "wltratio" : this["wltratio" + u],
+                  "inPlayoffs" : this["inPlayoffs" + u],
               })
 
           } else if(wltRec.playoff != null && wltRec.qual != null) {
@@ -189,13 +190,17 @@ function process(tKey, eKey, year, apiKey, u) {
               this["wins" + u] = this["wltRec" + u].playoff.record.wins + this["wltRec" + u].qual.ranking.record.wins;
               this["losses" + u] = this["wltRec" + u].playoff.record.losses + this["wltRec" + u].qual.ranking.record.losses;
               this["ties" + u] = this["wltRec" + u].playoff.record.ties + this["wltRec" + u].qual.ranking.record.ties;
+
               this["wltratio" + u] = (this["wins" + u]/(this["wins" + u]+this["losses" + u]+this["ties" + u])).toFixed(2);
+
               var ref = db.ref("/"+ year + "/" + eKey + "/" + tKey);
               ref.update({
                   "wltratio" : this["wltratio" + u],
+                  "inPlayoffs" : this["inPlayoffs" + u],
               })
-
           } else {
+
+            this["inPlayoffs" + u] = true;
             this["wins" + u] = this["wltRec" + u].playoff.record.wins;
             this["losses" + u] = this["wltRec" + u].playoff.record.losses;
             this["ties" + u] = this["wltRec" + u].playoff.record.ties;
@@ -203,11 +208,13 @@ function process(tKey, eKey, year, apiKey, u) {
             var ref = db.ref("/"+ year + "/" + eKey + "/" + tKey);
             ref.update({
                 "wltratio" : this["wltratio" + u],
+                "inPlayoffs" : this["inPlayoffs" + u],
             })
             // console.log(this["wins" + u])
             // console.log("Processing finished " + tKey + " at event " + eKey);
             // console.log(tKey + " " + this["wltratio" + u]);
           }
+        }
           }
           });
 
@@ -251,9 +258,9 @@ function process(tKey, eKey, year, apiKey, u) {
                   // console.log(this["teamScoreRequestObj" + u]);
               } else {
               this["teamTotal" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].alliances.blue.score;
-              outerVar += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.blue.autoCellsOuter + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsOuter;
-              innerVar += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.blue.autoCellsInner + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsInner;
-              bottomVar += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.blue.autoCellsBottom + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsBottom;
+              this["outerVar" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.blue.autoCellsOuter + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsOuter;
+              this["innerVar" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.blue.autoCellsInner + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsInner;
+              this["bottomVar" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.blue.autoCellsBottom + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsBottom;
               this["autoTotal" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.blue.autoPoints;
               this["tOPTotal" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.blue.teleopPoints;
             }
@@ -264,9 +271,9 @@ function process(tKey, eKey, year, apiKey, u) {
                   // console.log(this["teamScoreRequestObj" + u][this["matchNum" + u]]);
               } else {
               this["teamTotal" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].alliances.red.score;
-              outerVar += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.autoCellsOuter + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsOuter;
-              innerVar += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.autoCellsInner + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsInner;
-              bottomVar += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.autoCellsBottom + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsBottom;
+              this["outerVar" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.autoCellsOuter + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsOuter;
+              this["innerVar" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.autoCellsInner + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsInner;
+              this["bottomVar" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.autoCellsBottom + this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopCellsBottom;
               this["autoTotal" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.autoPoints;
               this["tOPTotal" + u] += this["teamScoreRequestObj" + u][this["matchNum" + u]].score_breakdown.red.teleopPoints;
             }
@@ -278,9 +285,9 @@ function process(tKey, eKey, year, apiKey, u) {
             this["teamAvg" + u] = (this["teamTotal" + u]/this["teamScoreRequestObj" + u].length).toFixed(2);
             this["autoAvg" + u] = (this["autoTotal" + u]/this["teamScoreRequestObj" + u].length).toFixed(2);
             this["tOPAvg" + u] = (this["tOPTotal" + u]/this["teamScoreRequestObj" + u].length).toFixed(2);
-            outerAvg = (outerVar/this["teamScoreRequestObj" + u].length).toFixed(2);
-            innerAvg = (innerVar/this["teamScoreRequestObj" + u].length).toFixed(2);
-            bottomAvg = (bottomVar/this["teamScoreRequestObj" + u].length).toFixed(2);
+            this["outerAvg" + u] = (this["outerVar" + u]/this["teamScoreRequestObj" + u].length).toFixed(2);
+            this["innerAvg" + u] = (this["innerVar" + u]/this["teamScoreRequestObj" + u].length).toFixed(2);
+            this["bottomAvg" + u] = (this["bottomVar" + u]/this["teamScoreRequestObj" + u].length).toFixed(2);
             this["teamTotal" + u];
             wins;
             losses;
@@ -293,7 +300,6 @@ function process(tKey, eKey, year, apiKey, u) {
                   "autoAvg" : this["autoAvg" + u],
                   "tOPAvg" : this["tOPAvg" + u],
                 },
-                "inPlayoffs" : inPlayoffs,
                 "games" : this["teamScoreRequestObj" + u].length
             })
             inPlayoffs;
