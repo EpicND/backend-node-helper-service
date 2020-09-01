@@ -4,8 +4,10 @@
   "description": "A server side node.js program to collect data from TBA (The Blue Alliance) and push to our own servers",
   "main": "server.js",
   "scripts": {
+    "test2": "node src/test.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "start2": "node src/server2.js"
   },
   "repository": {
     "type": "git",
