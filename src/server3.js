@@ -54,7 +54,7 @@ async function processTeamAtEvent(teamKey, eventKey) {
             return response.json();
         })
         .then(async (myJson) => {
-            await processData('2020', myJson, teamKey)
+            await processData(eventKey.substring(0, 4), myJson, teamKey)
         })
 
     return resp;
@@ -131,10 +131,8 @@ async function process2020(data, teamKey) {
                         handleData(data[i].score_breakdown.blue)
                     }
                     ties++;
-
+                    break;
             }
-
-
         }
     }
 
@@ -145,12 +143,11 @@ async function process2020(data, teamKey) {
         innerTotal += data.teleopCellsInner;
         bottomTotal += data.teleopCellsBottom;
         outerTotal += data.teleopCellsOuter;
-        if(teamKey === 'frc2264') console.log(totalTotal)
+        // if(teamKey === 'frc2264') console.log(totalTotal)
         // console.log('handling data', [teamKey])
     }
         totalAverage = totalTotal/matchesPlayed;
         winRate = (wins/(matchesPlayed - ties));
-        if(teamKey === 'frc2264') console.log(winRate);
 
 
 }
@@ -187,4 +184,4 @@ async function deleteAllDataAtEndpoint(endpoint) {
 }
 
 // processAllEvents();
-processEvent('2020mndu')
+processEvent('2020caln')
