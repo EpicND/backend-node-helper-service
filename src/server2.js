@@ -63,16 +63,19 @@ async function processEvent(eventKey) {
     var eventTeams = await getTeams(eventKey);
     var promiseArray = new Array;
     for(let i=0; i < eventTeams.length; i++) {
-        // processedEventObject[eventTeams[i].substring(3)] = await processTeamAtEvent(eventTeams[i], eventKey);
-        promiseArray.push(processTeamAtEvent(eventTeams[i], eventKey))
+        processTeamAtEvent(eventTeams[i], eventKey).then((returns) => {
+            processedEventObject[eventTeams[i].substring(3)] = returns;
+        })
+        // promiseArray.push(processTeamAtEvent(eventTeams[i], eventKey))
     }
 
-    await Promise.all(promiseArray).then((vals) => {
-        for(i=0; i<vals.length; i++) {
-            curVal = vals[i];
-            processedEventObject = {...processedEventObject, ...vals[i]};
-        }
-    })
+    // await Promise.all(promiseArray).then((vals) => {
+    //     for(i=0; i<vals.length; i++) {
+    //         curVal = vals[i];
+    //         processedEventObject = {...processedEventObject, ...vals[i]};
+    //     }
+    // })
+    
     console.log(processedEventObject)   
     // TODO: Retrieve and process data for every team at event
 }

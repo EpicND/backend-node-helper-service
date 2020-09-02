@@ -7,7 +7,8 @@
     "test2": "node src/test.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
-    "start2": "node src/server2.js"
+    "start2": "node src/server2.js",
+    "start3": "node src/server3.js"
   },
   "repository": {
     "type": "git",
