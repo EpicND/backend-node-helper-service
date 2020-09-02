@@ -102,7 +102,7 @@ async function processEvent(eventKey) {
 function pushDatatoFB(year, event, data) {
     var ref = db.ref("/"+ year);
     ref.update({
-        [event] : data
+        [event] : data,
     })
 
 }
@@ -121,6 +121,7 @@ async function process2020(data, teamKey) {
 
     var ties = 0;
     var wins = 0;
+
     //numbers used to calculate averages
     var teleOPTotal = 0;
     var autoTotal = 0;
@@ -226,7 +227,7 @@ async function processAllEventsInYear(year) {
     console.log(eventKeys);
 
     for(var i = 0; i < eventKeys.length; i++) {
-      await processEvent(eventKeys[i]);
+      processEvent(eventKeys[i]);
     }
 
 
@@ -236,10 +237,11 @@ async function processAllEventsInYear(year) {
 
 
 async function deleteAllDataAtEndpoint(endpoint) {
-
+    var ref = db.ref(`/${endpoint}/`);
+    ref.set(null)
 }
 
 processAllEventsInYear(2020);
-
+// deleteAllDataAtEndpoint(2020)
 // processEvent('2020mndu2')
 // processEvent('2020mnmi')
