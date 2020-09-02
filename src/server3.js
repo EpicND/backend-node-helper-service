@@ -159,10 +159,8 @@ async function process2020(data, teamKey) {
                         handleData(data[i].score_breakdown.blue)
                     }
                     ties++;
-
+                    break;
             }
-
-
         }
     }
 
@@ -193,11 +191,11 @@ async function process2020(data, teamKey) {
             "ties": ties
         }
         returnObject["averages"] = {
-            "avg": totalAverage.toFixed(2), 
-            "tOPAvg": teleOPAverage.toFixed(2), 
-            "autoAvg": autoAverage.toFixed(2), 
-            "innerAvg": innerAverage.toFixed(2), 
-            "bottomAvg": bottomAverage.toFixed(2), 
+            "avg": totalAverage.toFixed(2),
+            "tOPAvg": teleOPAverage.toFixed(2),
+            "autoAvg": autoAverage.toFixed(2),
+            "innerAvg": innerAverage.toFixed(2),
+            "bottomAvg": bottomAverage.toFixed(2),
             "outerAvg":outerAverage.toFixed(2),
             "wltRate": winRate.toFixed(2)
         }
