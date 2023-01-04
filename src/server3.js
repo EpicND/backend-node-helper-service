@@ -235,13 +235,9 @@ async function processAllEventsInYear(year) {
 
 
 
-
 async function deleteAllDataAtEndpoint(endpoint) {
     var ref = db.ref(`/${endpoint}/`);
     ref.set(null)
 }
 
 processAllEventsInYear(2020);
-// deleteAllDataAtEndpoint(2020)
-// processEvent('2020mndu2')
-// processEvent('2020mnmi')
