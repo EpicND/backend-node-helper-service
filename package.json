@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A server side node.js program to collect data from TBA (The Blue Alliance) and push to our own servers",
   "main": "server.js",
+  "module": "es2022",
   "scripts": {
     "test2": "node src/test.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,5 +24,8 @@
   "dependencies": {
     "firebase-admin": "^8.12.1",
     "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/es6-promise": "^3.3.0"
   }
 }
